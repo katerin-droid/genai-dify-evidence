@@ -48,3 +48,6 @@ volumes/
 # Unauthorized course source materials
 /materials/
 /course-materials/
+
+# Local real-model smoke-test measurements
+/docs/local-deepseek-smoke-*.json

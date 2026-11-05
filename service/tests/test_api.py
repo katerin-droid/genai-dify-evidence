@@ -25,7 +25,8 @@ def test_verify_mock(client):
     assert response.status_code == 200
     body = response.json()
     assert body["mode"] == "mock"
-    assert body["status"] == "not_evaluated"
+    assert body["overall_status"] == "not_evaluated"
+    assert "status" not in body
     assert body["score"] is None and body["support_label"] is None
     assert body["evidence_count"] == 1
     assert client.post("/verify", json=PAYLOAD).json() == body

@@ -1,4 +1,22 @@
-# 部署准备记录（2026-11-05，Asia/Shanghai）
+# 部署说明（2026-11-05，Asia/Shanghai）
+
+## 当前稳定版本状态
+
+以下后半部分为早期ECS准备历史，不是当前部署步骤。当前采用Windows本地优先策略，暂不连接华为云。Dify 1.19.0官方源码独立位于 D:/opensource/dify，commit为8e689e868b63b6dd2b449d0eb568ca5cc7127759；已运行并由用户初始化管理员。自研仓库已关联Public GitHub，.git状态以实际命令为准。
+
+本地Dify Compose项目为dify-local，使用官方docker/docker-compose.yaml和本仓库deploy/dify-local.override.yaml；管理命令必须始终携带该override，保持80/443/5003只绑定127.0.0.1。真实.env与运行数据不提交；已有Dify无需为本次发布重启。
+
+自研FastAPI配置与Dify分离。在本仓库创建被忽略的.env，参考.env.example配置模式、API Key、HTTPS Base URL、账户模型ID。默认mock不收费；deepseek-flash已通过单次真实冒烟，模型名仍可配置。
+
+```powershell
+python -m pip install -r service/requirements-dev.txt
+python -m pytest -q
+python -m uvicorn service.app.main:app --env-file .env --host 127.0.0.1 --port 8000
+```
+
+以上启动命令供后续使用，本次Git发布不启动服务或操作容器。Dockerfile构建上下文为service/，自研Compose和Dify网络/SSRF代理联调尚未完成；不能假定localhost互通或宣称生产可用。真实核验失败应检查overall_status/error_code。
+
+## 早期ECS准备历史（保留记录）
 
 ## 已核实的官方发布
 - 官方仓库：https://github.com/langgenius/dify.git

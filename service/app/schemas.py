@@ -1,5 +1,5 @@
-from typing import Annotated, Literal
-from pydantic import BaseModel, ConfigDict, Field, StringConstraints
+from typing import Annotated, Literal, Any
+from pydantic import AliasChoices, BaseModel, ConfigDict, Field, StringConstraints, model_validator
 
 Text = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=20000, strict=True)]
 Identifier = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=128, strict=True)]
@@ -8,8 +8,11 @@ class StrictModel(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
 class Evidence(StrictModel):
-    evidence_id: Identifier
-    text: Text
+    evidence_id: Identifier = Field(validation_alias=AliasChoices("id", "evidence_id"))
+    text: Text = Field(validation_alias=AliasChoices("content", "text"))
+    source: Annotated[str, StringConstraints(max_length=2000, strict=True)] | None = None
+    page: Annotated[int, Field(strict=True, ge=1)] | Identifier | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
 
 class VerifyRequest(StrictModel):
     question: Text
@@ -18,8 +21,48 @@ class VerifyRequest(StrictModel):
 
 class VerifyResponse(StrictModel):
     mode: Literal["mock"] = "mock"
-    status: Literal["not_evaluated"] = "not_evaluated"
+    overall_status: Literal["not_evaluated"] = "not_evaluated"
     support_label: None = None
     score: None = None
     evidence_count: int = Field(ge=1)
     message: str = "Mock response only; no evidence verification or model call performed."
+
+
+class EvidenceVerifyRequest(VerifyRequest):
+    evidence: list[Evidence] = Field(max_length=50)
+
+    @model_validator(mode="after")
+    def unique_ids(self):
+        ids = [e.evidence_id for e in self.evidence]
+        if len(ids) != len(set(ids)):
+            raise ValueError("Evidence IDs must be unique")
+        return self
+
+
+Status = Literal["supported", "partially_supported", "unsupported", "verification_failed"]
+
+
+class Citation(StrictModel):
+    evidence_id: Identifier
+    quote: Text
+
+
+class ClaimResult(StrictModel):
+    claim: Text
+    status: Status
+    evidence_ids: list[Identifier] = Field(max_length=50)
+    reason: Text
+    citations: list[Citation] = Field(default_factory=list, max_length=50)
+
+
+class ModelResult(StrictModel):
+    claims: list[ClaimResult] = Field(max_length=5)
+
+
+class EvidenceVerifyResponse(StrictModel):
+    mode: Literal["deepseek"] = "deepseek"
+    overall_status: Status
+    claims: list[ClaimResult] = Field(default_factory=list, max_length=5)
+    evidence_count: int = Field(ge=0)
+    message: str
+    error_code: str | None = None

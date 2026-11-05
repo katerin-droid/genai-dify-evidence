@@ -1,0 +1,50 @@
+# Secrets and local runtime
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+id_rsa*
+id_ed25519*
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+# Upstream source must stay outside this repository
+/vendor/
+/dify/api/
+/dify/web/
+/dify/docker/
+# Private course materials and runtime output
+/data/
+/volumes/
+*.log
+
+# Additional credential and database artifacts
+*.pfx
+*.p12
+*.p8
+*.jks
+*.keystore
+credentials.json
+secrets.json
+.npmrc
+.netrc
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+*.sqlite-*
+*.sql
+*.dump
+*.bak
+logs/
+volumes/
+# Local-only operational evidence; do not publish machine-specific records
+/docs/phase-two-*.json
+/docs/local-*.md
+# Unauthorized course source materials
+/materials/
+/course-materials/

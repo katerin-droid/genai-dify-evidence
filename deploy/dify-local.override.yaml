@@ -1,0 +1,9 @@
+# Local access only. Always combine with the fixed official Compose file.
+services:
+  nginx:
+    ports: !override
+      - "127.0.0.1:80:80"
+      - "127.0.0.1:443:443"
+  plugin_daemon:
+    ports: !override
+      - "127.0.0.1:5003:5003"

@@ -51,3 +51,7 @@ volumes/
 
 # Local real-model smoke-test measurements
 /docs/local-deepseek-smoke-*.json
+
+# User-provided memes: public redistribution rights pending confirmation
+/web/assets/mascots/
+/artifacts/ui/

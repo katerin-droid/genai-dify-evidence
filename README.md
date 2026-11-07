@@ -83,3 +83,9 @@ evidence_ids 为去重 ID 列表；citations 为原文引用列表，两者 ID �
 
 2026-11-05：50项离线pytest通过。已用 deepseek-flash 完成一次三陈述真实核验，DeepSeek与本地接口均HTTP200，结果为 supported / partially_supported / unsupported，总体 partially_supported，证据ID和原文引用检查通过。该单题冒烟不代表批量准确率；详细脱敏结果见开发记录。
 默认模式仍为Mock，模板不包含密钥或默认模型ID。Dify管理员由用户完成初始化；FastAPI与Dify容器网络/工作流联调尚未验收，不是完整生产部署。
+
+## 课程资料侦探社展示层
+
+已新增原生HTML/CSS/JS展示页，由FastAPI根路径提供。用Mock模式本机启动后访问 http://127.0.0.1:8000/；真实Dify问答代理尚未集成，入口明确显示未连接。独立体验示例不调用模型，保留示例标记。素材清单、交互测试、截图路径及Public版权边界见 [展示层说明](docs/web-showcase.md)。
+
+公开仓库仅包含展示代码，**不包含10张角色图片或截图**。使用者需自行准备有权使用的素材，按 docs/web-showcase.md 的路径清单放入 web/assets/mascots/；缺图时页面显示文字备用。未提供图片时相关测试会明确跳过，不等同于本地62项完整验收。真实Dify问答入口仍未连接，体验示例不是实际模型问答。

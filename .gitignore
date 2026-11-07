@@ -52,6 +52,21 @@ volumes/
 # Local real-model smoke-test measurements
 /docs/local-deepseek-smoke-*.json
 
-# User-provided memes: public redistribution rights pending confirmation
-/web/assets/mascots/
+# User-provided memes: deny by default; only explicitly approved files below
+/web/assets/mascots/**
 /artifacts/ui/
+
+# User-authorized public inclusion: exactly ten original mascot files
+!/web/assets/mascots/bigfish/
+!/web/assets/mascots/nailong/
+!/web/assets/mascots/gugugaga/
+!/web/assets/mascots/bigfish/bigfish_main.jpg
+!/web/assets/mascots/bigfish/bigfish_self_comfort.jpg
+!/web/assets/mascots/bigfish/bigfish_busy.webp
+!/web/assets/mascots/nailong/nailong_face.jpg
+!/web/assets/mascots/nailong/nailong_wait.jpg
+!/web/assets/mascots/nailong/nailong_look.jpg
+!/web/assets/mascots/gugugaga/gugugaga_smirk.jpg
+!/web/assets/mascots/gugugaga/gugugaga_thumbsup.webp
+!/web/assets/mascots/gugugaga/gugugaga_sideeye.jpg
+!/web/assets/mascots/gugugaga/gugugaga_salute.jpg

@@ -10,6 +10,7 @@ class Settings:
     base_url: str = "https://api.deepseek.com"
     model: str = ""
     timeout: float = 30.0
+    max_tokens: int = 8192
 
     def __post_init__(self):
         if self.mode not in {"mock", "deepseek"}:
@@ -23,6 +24,8 @@ class Settings:
                 raise ValueError("DeepSeek mode requires API key and explicit model configuration")
             if not 0 < self.timeout <= 300:
                 raise ValueError("DeepSeek timeout must be between 0 and 300 seconds")
+            if not 256 <= self.max_tokens <= 65536:
+                raise ValueError("DeepSeek max_tokens must be between 256 and 65536")
 
 def get_settings() -> Settings:
     mode = os.getenv("VERIFIER_MODE", "mock")
@@ -31,7 +34,8 @@ def get_settings() -> Settings:
     return Settings(mode=mode, api_key=os.getenv("DEEPSEEK_API_KEY", ""),
                     base_url=os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com").rstrip("/"),
                     model=os.getenv("DEEPSEEK_MODEL", ""),
-                    timeout=float(os.getenv("DEEPSEEK_TIMEOUT_SECONDS", "30")))
+                    timeout=float(os.getenv("DEEPSEEK_TIMEOUT_SECONDS", "30")),
+                    max_tokens=int(os.getenv("DEEPSEEK_MAX_TOKENS", "8192")))
 
 
 @dataclass(frozen=True)

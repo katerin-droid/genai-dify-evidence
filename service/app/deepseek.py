@@ -45,7 +45,7 @@ class DeepSeekClient:
                                            "metadata": e.metadata} for e in request.evidence]
                          }, ensure_ascii=False)}],
             "response_format": {"type": "json_object"},
-            "max_tokens": 4096, "stream": False,
+            "max_tokens": self.settings.max_tokens, "stream": False,
         }
         try:
             with httpx.Client(transport=self.transport, timeout=self.settings.timeout,

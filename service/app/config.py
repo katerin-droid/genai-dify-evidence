@@ -32,3 +32,32 @@ def get_settings() -> Settings:
                     base_url=os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com").rstrip("/"),
                     model=os.getenv("DEEPSEEK_MODEL", ""),
                     timeout=float(os.getenv("DEEPSEEK_TIMEOUT_SECONDS", "30")))
+
+
+@dataclass(frozen=True)
+class ChatSettings:
+    """Dify application API settings for the /api/chat proxy. Never prints credentials."""
+    base_url: str
+    api_key: str = field(default="", repr=False)
+    timeout: float = 120.0
+
+    def __post_init__(self):
+        url = urlsplit(self.base_url)
+        if (url.scheme not in {"http", "https"} or not url.hostname or url.username
+                or url.password or url.query or url.fragment):
+            raise ValueError("DIFY_API_BASE_URL must be an HTTP(S) URL without credentials/query/fragment")
+        if not self.api_key.strip():
+            raise ValueError("Chat proxy requires a Dify application API key")
+        if not 0 < self.timeout <= 300:
+            raise ValueError("Dify timeout must be between 0 and 300 seconds")
+
+
+def get_chat_settings() -> ChatSettings | None:
+    """Returns None when the Dify proxy is not configured; the endpoint reports 503."""
+    key = os.getenv("DIFY_API_KEY", "")
+    if not key.strip():
+        return None
+    return ChatSettings(
+        base_url=os.getenv("DIFY_API_BASE_URL", "http://127.0.0.1:8081/v1").rstrip("/"),
+        api_key=key,
+        timeout=float(os.getenv("DIFY_TIMEOUT_SECONDS", "120")))

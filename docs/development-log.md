@@ -100,3 +100,11 @@
 - 通过控制台导出应用包（.ifpkg），解出 app.yaml 并落库为 dify/workflow/chatflow-course-qa.yml（kind: app，version: 0.7.0）；YAML 可解析，7 节点 6 边。
 - 导出文件扫描 app-、sk-、Bearer、api_key、secret、password、token 无命中；模型凭据仍在 Dify 平台侧，未进入仓库。
 - 未修改 Dify 官方源码，未操作容器，未提交或推送 Git；30 题实验与 /api/chat 代理仍未完成。
+
+## 2026-11-11 /api/chat Dify 代理与真实问答入口（feat/dify-chat-proxy）
+- 新增 service/app/dify.py：DifyClient 调用 Dify blocking chat-messages，inputs.question 与 query 同传用户问题，conversation_id 透传；split_answer 把「LLM 文本 + 空行 + 核验 JSON」拆回两部分。
+- main.py 新增 POST /api/chat：上游超时/HTTP 错误/不可达/响应非法分别映射 verification_failed + upstream_timeout/upstream_http_error/upstream_unavailable/invalid_upstream_response；未配置 DIFY_API_KEY 时返回 503。
+- /api/chat 只转发并解析，不重复调用 DeepSeek 核验；/verify 契约与核心逻辑未改。
+- ui-status 增加 chat_available/dify_connected；前端真实问答入口仅在代理配置后可用，渲染 AI 回答与 claims，未连接时保持「服务尚未连接」。
+- 离线测试 13 项（MockTransport，无真实 HTTP），全量回归 81 passed。
+- SSH 隧道中断且服务器拒绝公钥（Permission denied），应用 API Key 创建与真实联调待崔贵恬恢复服务器访问后进行；未推送 GitHub。

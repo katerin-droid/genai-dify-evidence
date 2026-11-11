@@ -1,0 +1,1 @@
+run_id,mode,app_name,app_version,dify_version,kb_index_mode,embedding_model,llm_model,top_k,score_threshold,commit,started_at,finished_at,operator,notes

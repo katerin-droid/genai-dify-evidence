@@ -91,3 +91,12 @@
 - 原有50项与新增12项全部通过：62 passed in 17.53s，仅两个websockets弃用警告。核验Schema、配置、DeepSeek客户端、核心verifier和原有verify路由逻辑均未改。
 - 发布仅含展示代码和文档，图片/截图/.env不提交；README与展示说明明确要求另行准备授权素材，真实Dify问答代理尚未集成。
 - 按用户授权提交 feat: add interactive mascot-based showcase UI，发布标签v0.2-showcase；不调用模型、不操作Dify容器或改写远程历史。
+
+## 2026-11-11 Dify Chatflow 打通与 DSL 导出
+- 在云端 Dify 1.19.0 控制台新建 Chatflow「课程问答证据核验」：用户输入 → 知识检索（genai-course-vector-v2，bge-m3，top_k=5）→ 代码执行（Evidence 裁剪）→ LLM（deepseek-flash，temperature 0.2）→ JSON转义（代码执行）→ HTTP 请求（POST http://verifier:8000/verify）→ 直接回复。
+- 首轮端到端失败：HTTP 节点返回 422 Invalid control character at body 45。原因是 LLM 文本含换行与 think 片段，Dify 变量插值按原样字符串拼接，不做 JSON 转义。
+- 修复方式：新增 JSON转义代码节点，剥离 think 段后用 json.dumps 生成完整请求体；HTTP 节点 body 改为 raw-text，只插值一个变量。代码节点输出变量名必须与 return 的 key 完全一致，否则报 Not all output parameters are validated。
+- 预览验证：输入「什么是 KV Cache？」，overall_status=supported，3 条 claims 均为 supported 且带 evidence_ids/citations，evidence_count=3，error_code=null。工作流发布为版本 #3。
+- 通过控制台导出应用包（.ifpkg），解出 app.yaml 并落库为 dify/workflow/chatflow-course-qa.yml（kind: app，version: 0.7.0）；YAML 可解析，7 节点 6 边。
+- 导出文件扫描 app-、sk-、Bearer、api_key、secret、password、token 无命中；模型凭据仍在 Dify 平台侧，未进入仓库。
+- 未修改 Dify 官方源码，未操作容器，未提交或推送 Git；30 题实验与 /api/chat 代理仍未完成。

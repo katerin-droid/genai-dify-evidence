@@ -1,0 +1,412 @@
+app:
+  description: ''
+  icon: 🤖
+  icon_background: '#FFEAD5'
+  icon_type: emoji
+  mode: advanced-chat
+  name: 课程问答证据核验
+  use_icon_as_answer_icon: false
+dependencies:
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/deepseek:0.0.26@bdf47cb41e9062bba00d26625d2a795c1874011d8ce64bff738c44b5a31787ea
+    version: null
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/siliconflow:0.0.64@6cf29a175480b384dcada3791849b2c30dfcff5d4ad2ee4b7eeb0dcd7c2b817f
+    version: null
+kind: app
+site:
+  chat_color_theme: null
+  chat_color_theme_inverted: false
+  copyright: null
+  custom_disclaimer: ''
+  default_language: zh-Hans
+  description: null
+  icon: 🤖
+  icon_background: '#FFEAD5'
+  icon_type: emoji
+  input_placeholder: null
+  privacy_policy: null
+  show_workflow_steps: true
+  title: 课程问答证据核验
+  use_icon_as_answer_icon: false
+version: 0.7.0
+workflow:
+  conversation_variables: []
+  environment_variables: []
+  features:
+    file_upload: {}
+    opening_statement: ''
+    retriever_resource:
+      enabled: true
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: start
+        targetType: knowledge-retrieval
+      id: 1794379920773-source-1794380263407-target
+      selected: false
+      source: '1794379920773'
+      sourceHandle: source
+      target: '1794380263407'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: knowledge-retrieval
+        targetType: code
+      id: 1794380263407-source-1794382596723-target
+      selected: false
+      source: '1794380263407'
+      sourceHandle: source
+      target: '1794382596723'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: code
+        targetType: llm
+      id: 1794382596723-source-llm-target
+      selected: false
+      source: '1794382596723'
+      sourceHandle: source
+      target: llm
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: http-request
+        targetType: answer
+      id: 1794383467582-source-answer-target
+      selected: false
+      source: '1794383467582'
+      sourceHandle: source
+      target: answer
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: code
+      id: llm-source-1794385197750-target
+      selected: false
+      source: llm
+      sourceHandle: source
+      target: '1794385197750'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: code
+        targetType: http-request
+      id: 1794385197750-source-1794383467582-target
+      selected: false
+      source: '1794385197750'
+      sourceHandle: source
+      target: '1794383467582'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        selected: false
+        title: 用户输入
+        type: start
+        variables:
+        - default: ''
+          hint: ''
+          label: question
+          options: []
+          placeholder: ''
+          required: true
+          type: text-input
+          variable: question
+      height: 108
+      id: '1794379920773'
+      position:
+        x: 0
+        y: 5.5
+      positionAbsolute:
+        x: 0
+        y: 5.5
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+      zIndex: 0
+    - data:
+        context:
+          enabled: true
+          variable_selector:
+          - '1794380263407'
+          - result
+        memory:
+          query_prompt_template: '问题：{{#1794379920773.question#}}
+
+            检索资料如下
+
+            {{#1794380263407.result#}}
+
+            对话输入：{{#sys.query#}}'
+          role_prefix:
+            assistant: ''
+            user: ''
+          window:
+            enabled: false
+            size: 10
+        model:
+          completion_params:
+            temperature: 0.2
+          mode: chat
+          name: deepseek-flash
+          provider: langgenius/deepseek/deepseek
+        prompt_template:
+        - id: 05ba49c1-72cc-487e-bc5f-e21a3c2c991f
+          role: system
+          text: 你是课程资料问答助手。只能依据【检索资料】回答，不得使用训练数据补充。如果资料不足以回答，直接说明「资料中没有相关内容」，不要猜测。回答控制在
+            3 句话内，并在每个结论后用（E1）（E2）这样的编号标注依据的段落序号。
+        selected: false
+        title: LLM
+        type: llm
+        vision:
+          enabled: false
+      height: 87
+      id: llm
+      position:
+        x: 1024
+        y: 16
+      positionAbsolute:
+        x: 1024
+        y: 16
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 0
+    - data:
+        answer: '{{#llm.text#}}
+
+
+          {{#1794383467582.body#}}'
+        selected: false
+        title: 直接回复
+        type: answer
+        variables: []
+      height: 119
+      id: answer
+      position:
+        x: 2047
+        y: 0
+      positionAbsolute:
+        x: 2047
+        y: 0
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 0
+    - data:
+        dataset_ids:
+        - jlXqQ6rZleONM9LBz/hw1WEzThJ+b+XNPsQU0NgAdp9wJKkD4TlDWNfx/VAADs1t
+        multiple_retrieval_config:
+          reranking_enable: false
+          reranking_mode: weighted_score
+          reranking_model:
+            model: BAAI/bge-reranker-v2-m3
+            provider: langgenius/siliconflow/siliconflow
+          score_threshold: null
+          top_k: 5
+          weights:
+            keyword_setting:
+              keyword_weight: 0
+            vector_setting:
+              embedding_model_name: BAAI/bge-m3
+              embedding_provider_name: langgenius/siliconflow/siliconflow
+              vector_weight: 1
+            weight_type: customized
+        query_attachment_selector: []
+        query_variable_selector:
+        - '1794379920773'
+        - question
+        retrieval_mode: multiple
+        selected: false
+        title: 知识检索
+        type: knowledge-retrieval
+      height: 89
+      id: '1794380263407'
+      position:
+        x: 342
+        y: 15
+      positionAbsolute:
+        x: 342
+        y: 15
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 0
+    - data:
+        code: "def main(chunks: list) -> dict:\n        return (lambda e: {\"evidence_json\"\
+          : __import__(\"json\").dumps(e, ensure_ascii=False), \"evidence_count\"\
+          : len(e)})([{\"id\": \"E\" + str(i + 1), \"content\": v[0][:20000], \"source\"\
+          : str(v[1])[:2000], **({\"page\": v[2]} if isinstance(v[2], int) and v[2]\
+          \ >= 1 else {})} for i, v in enumerate(list({v[0]: v for v in [((c.get(\"\
+          content\") or \"\").strip(), (c.get(\"title\") or c.get(\"document_name\"\
+          ) or (c.get(\"metadata\") or {}).get(\"document_name\") or \"unknown\"),\
+          \ (c.get(\"metadata\") or {}).get(\"page\")) for c in (chunks or [])] if\
+          \ v[0]}.values()))][:50])"
+        code_language: python3
+        outputs:
+          evidence_count:
+            children: null
+            type: number
+          evidence_json:
+            children: null
+            type: string
+        selected: false
+        title: 代码执行
+        type: code
+        variables:
+        - value_selector:
+          - '1794380263407'
+          - result
+          value_type: array[object]
+          variable: chunks
+      height: 51
+      id: '1794382596723'
+      position:
+        x: 683
+        y: 34
+      positionAbsolute:
+        x: 683
+        y: 34
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 0
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data:
+          - type: text
+            value: '{{#1794385197750.result#}}'
+          type: raw-text
+        headers: 'Content-Type: application/json'
+        method: post
+        params: ''
+        retry_config:
+          max_retries: 3
+          retry_enabled: false
+          retry_interval: 100
+        selected: false
+        ssl_verify: true
+        timeout:
+          connect: 10
+          max_connect_timeout: 0
+          max_read_timeout: 0
+          max_write_timeout: 0
+          read: 60
+        title: HTTP 请求
+        type: http-request
+        url: http://verifier:8000/verify
+        variables: []
+      height: 91
+      id: '1794383467582'
+      position:
+        x: 1706
+        y: 14
+      positionAbsolute:
+        x: 1706
+        y: 14
+      selected: true
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 0
+    - data:
+        code: "def main(answer: str = \"\", question: str = \"\", evidence_json: str\
+          \ = \"\") -> dict:\n    import json, re\n    s = answer or \"\"\n    s =\
+          \ re.sub(r\"(?is)<think.*?</think[^>]*>\", \"\", s)\n    s = re.sub(r\"\
+          (?is)</?think[^>]*>\", \"\", s).strip() or (answer or \"\").strip()\n  \
+          \  try:\n        ev = json.loads(evidence_json) if evidence_json else []\n\
+          \    except Exception:\n        ev = []\n    body = {\"question\": question\
+          \ or \"\", \"answer\": s, \"evidence\": ev}\n    return {\"result\": json.dumps(body,\
+          \ ensure_ascii=False)}"
+        code_language: python3
+        outputs:
+          result:
+            children: null
+            type: string
+        selected: false
+        title: JSON转义
+        type: code
+        variables:
+        - value_selector:
+          - llm
+          - text
+          value_type: string
+          variable: answer
+        - value_selector:
+          - '1794379920773'
+          - question
+          value_type: string
+          variable: question
+        - value_selector:
+          - '1794382596723'
+          - evidence_json
+          value_type: string
+          variable: evidence_json
+      height: 51
+      id: '1794385197750'
+      position:
+        x: 1365
+        y: 34
+      positionAbsolute:
+        x: 1365
+        y: 34
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 0
+    viewport:
+      x: -348.53819444444457
+      y: 432.89699074074076
+      zoom: 0.40509259259259267
+  rag_pipeline_variables: []

@@ -52,6 +52,9 @@ volumes/
 # Local real-model smoke-test measurements
 /docs/local-deepseek-smoke-*.json
 
+# Real evaluation data and course materials
+/evaluation/private/
+
 # User-provided memes: deny by default; only explicitly approved files below
 /web/assets/mascots/**
 /artifacts/ui/

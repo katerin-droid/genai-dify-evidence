@@ -1,1 +1,2 @@
 run_id,mode,app_name,app_version,dify_version,kb_index_mode,embedding_model,llm_model,top_k,score_threshold,commit,started_at,finished_at,operator,notes
+run-20261111-improved,improved,课程问答证据核验,#3,1.19.0,high_quality,BAAI/bge-m3,deepseek-flash,5,,b17d519,2026-11-11T17:59:36+08:00,2026-11-11T18:06:49+08:00,刘英超,Dify Chatflow 含 /verify 核验节点；每题独立会话。

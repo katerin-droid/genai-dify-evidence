@@ -1,1 +1,89 @@
 run_id,question_id,claim_id,mode,overall_status,claim_status,support_label,score,error_code,latency_ms,model,commit,checked_at,notes
+run-20261111-improved,Q01,Q01-S1,improved,supported,supported,,,,12962,deepseek-flash,b17d519,2026-11-11T17:59:49+08:00,判别式模型学习 P(y | x)，即给定输入 x 时标签 y 的概率。
+run-20261111-improved,Q01,Q01-S2,improved,supported,supported,,,,12962,deepseek-flash,b17d519,2026-11-11T17:59:49+08:00,"生成式模型学习 P(x) 或 P(x, y)，从而能够采样生成新的 x 或 (x, y)。"
+run-20261111-improved,Q01,Q01-S3,improved,supported,supported,,,,12962,deepseek-flash,b17d519,2026-11-11T17:59:49+08:00,生成式与判别式的区分不是绝对的。
+run-20261111-improved,Q01,Q01-S4,improved,supported,supported,,,,12962,deepseek-flash,b17d519,2026-11-11T17:59:49+08:00,现代大语言模型既可以做生成，也可以做分类、抽取、改写等任务。
+run-20261111-improved,Q01,Q01-S5,improved,supported,supported,,,,12962,deepseek-flash,b17d519,2026-11-11T17:59:49+08:00,课程语境里以“生成新内容”作为生成式 AI 的主要特征。
+run-20261111-improved,Q02,Q02-S1,improved,supported,supported,,,,7619,deepseek-flash,b17d519,2026-11-11T17:59:56+08:00,预训练让模型“见得多”，学习语言和世界知识的统计规律。
+run-20261111-improved,Q02,Q02-S2,improved,supported,supported,,,,7619,deepseek-flash,b17d519,2026-11-11T17:59:56+08:00,指令微调让模型“会按要求说”，学会按指令完成任务。
+run-20261111-improved,Q02,Q02-S3,improved,supported,supported,,,,7619,deepseek-flash,b17d519,2026-11-11T17:59:56+08:00,对齐让模型“更符合人类偏好”，使输出更符合人类偏好和安全要求。
+run-20261111-improved,Q03,Q03-S1,improved,supported,supported,,,,11007,deepseek-flash,b17d519,2026-11-11T18:00:07+08:00,位置编码用于在 Transformer 中保留并注入序列的顺序信息，因为模型不再依赖循环结构。
+run-20261111-improved,Q03,Q03-S2,improved,supported,supported,,,,11007,deepseek-flash,b17d519,2026-11-11T18:00:07+08:00,它把“顺序”从循环结构中取出，作为额外信号注入，以支持各位置直接交互的并行计算架构。
+run-20261111-improved,Q04,Q04-S1,improved,supported,supported,,,,6507,deepseek-flash,b17d519,2026-11-11T18:00:14+08:00,当 Q 和 K 的维度较大时，点积的方差会变大，导致 softmax 变得非常尖锐，进而使梯度变小、训练不稳定。
+run-20261111-improved,Q04,Q04-S2,improved,supported,supported,,,,6507,deepseek-flash,b17d519,2026-11-11T18:00:14+08:00,除以 sqrt(d_k) 可以让注意力分数保持在较合理的范围。
+run-20261111-improved,Q05,Q05-S1,improved,supported,supported,,,,8398,deepseek-flash,b17d519,2026-11-11T18:00:22+08:00,KV Cache 缓存已生成 token 的 Key 和 Value，下一步只计算新 token 的 Q、K、V，避免重复计算。
+run-20261111-improved,Q05,Q05-S2,improved,supported,supported,,,,8398,deepseek-flash,b17d519,2026-11-11T18:00:22+08:00,KV Cache 能显著降低生成延迟。
+run-20261111-improved,Q05,Q05-S3,improved,supported,supported,,,,8398,deepseek-flash,b17d519,2026-11-11T18:00:22+08:00,KV Cache 的代价是占用显存，且序列越长占用越大。
+run-20261111-improved,Q05,Q05-S4,improved,supported,supported,,,,8398,deepseek-flash,b17d519,2026-11-11T18:00:22+08:00,长上下文场景还可采用 KV Cache 压缩等技术。
+run-20261111-improved,Q06,Q06-S0,improved,verification_failed,,,,invalid_citations,7493,deepseek-flash,b17d519,2026-11-11T18:00:30+08:00,Verification could not be completed: invalid_citations
+run-20261111-improved,Q07,Q07-S1,improved,partially_supported,supported,,,,18091,deepseek-flash,b17d519,2026-11-11T18:00:48+08:00,资料将 DPO 列为偏好对齐方法。
+run-20261111-improved,Q07,Q07-S2,improved,partially_supported,supported,,,,18091,deepseek-flash,b17d519,2026-11-11T18:00:48+08:00,DPO 的直观目标是提高“被偏好的回答”的相对概率、降低“被拒绝的回答”的相对概率。
+run-20261111-improved,Q07,Q07-S3,improved,partially_supported,supported,,,,18091,deepseek-flash,b17d519,2026-11-11T18:00:48+08:00,相比 RLHF，DPO 实现更简单、训练更稳定。
+run-20261111-improved,Q07,Q07-S4,improved,partially_supported,unsupported,,,,18091,deepseek-flash,b17d519,2026-11-11T18:00:48+08:00,资料没有具体说明 DPO 相比 RLHF 简化了哪些组件或步骤。
+run-20261111-improved,Q08,Q08-S1,improved,supported,supported,,,,8934,deepseek-flash,b17d519,2026-11-11T18:00:57+08:00,数据污染是指评测集的问题或答案出现在训练数据中，导致评测分数虚高。
+run-20261111-improved,Q08,Q08-S2,improved,supported,supported,,,,8934,deepseek-flash,b17d519,2026-11-11T18:00:57+08:00,资料仅以“常见检查方法：”引出，但未列出具体检查方法。
+run-20261111-improved,Q09,Q09-S0,improved,verification_failed,,,,claim_verification_failed,11963,deepseek-flash,b17d519,2026-11-11T18:01:09+08:00,Verification could not be completed: claim_verification_failed
+run-20261111-improved,Q10,Q10-S1,improved,supported,supported,,,,5335,deepseek-flash,b17d519,2026-11-11T18:01:14+08:00,多头注意力将 Q、K、V 投影到多个子空间并让各头独立计算注意力，结果拼接后再做线性变换。
+run-20261111-improved,Q10,Q10-S2,improved,supported,supported,,,,5335,deepseek-flash,b17d519,2026-11-11T18:01:14+08:00,单头注意力只能学习一种匹配模式，多头注意力可以弥补这一限制。
+run-20261111-improved,Q10,Q10-S3,improved,supported,supported,,,,5335,deepseek-flash,b17d519,2026-11-11T18:01:14+08:00,“头越多越好”不成立，因为增加头数会增加计算量和参数。
+run-20261111-improved,Q10,Q10-S4,improved,supported,supported,,,,5335,deepseek-flash,b17d519,2026-11-11T18:01:14+08:00,多头注意力的实际效果取决于模型规模、训练数据和任务。
+run-20261111-improved,Q10,Q10-S5,improved,supported,supported,,,,5335,deepseek-flash,b17d519,2026-11-11T18:01:14+08:00,某些头训练后可能变得不重要甚至可被剪枝。
+run-20261111-improved,Q11,Q11-S1,improved,supported,supported,,,,14261,deepseek-flash,b17d519,2026-11-11T18:01:28+08:00,SFT 的目标是让模型学会按指令回答、掌握行为格式和任务模式。
+run-20261111-improved,Q11,Q11-S2,improved,supported,supported,,,,14261,deepseek-flash,b17d519,2026-11-11T18:01:28+08:00,RLHF 的目标是优化人类偏好，使行为更符合偏好，但不直接优化事实正确性。
+run-20261111-improved,Q11,Q11-S3,improved,supported,supported,,,,14261,deepseek-flash,b17d519,2026-11-11T18:01:28+08:00,数据上，SFT 关键依赖高质量、多样化的指令数据和正确的损失掩码。
+run-20261111-improved,Q11,Q11-S4,improved,supported,supported,,,,14261,deepseek-flash,b17d519,2026-11-11T18:01:28+08:00,RLHF 通过奖励模型和强化学习来优化偏好。
+run-20261111-improved,Q12,Q12-S1,improved,supported,supported,,,,19337,deepseek-flash,b17d519,2026-11-11T18:01:47+08:00,资料给出的 RAG 流程是“检索相关文档—拼接进 Prompt—模型生成答案”
+run-20261111-improved,Q12,Q12-S2,improved,supported,supported,,,,19337,deepseek-flash,b17d519,2026-11-11T18:01:47+08:00,RAG 先从外部知识库检索与问题相关的片段并放入上下文，再让模型基于片段回答
+run-20261111-improved,Q12,Q12-S3,improved,supported,supported,,,,19337,deepseek-flash,b17d519,2026-11-11T18:01:47+08:00,检索负责找到相关片段/文档
+run-20261111-improved,Q12,Q12-S4,improved,supported,supported,,,,19337,deepseek-flash,b17d519,2026-11-11T18:01:47+08:00,生成负责基于上下文中的片段生成答案
+run-20261111-improved,Q13,Q13-S1,improved,supported,supported,,,,21632,deepseek-flash,b17d519,2026-11-11T18:02:09+08:00,第1段仅将“为什么向量检索之外还需要关键词检索或重排”列为思考题，未给出原因。
+run-20261111-improved,Q13,Q13-S2,improved,supported,supported,,,,21632,deepseek-flash,b17d519,2026-11-11T18:02:09+08:00,第2段只说明真实系统会增加重排等步骤，未解释向量检索的不足。
+run-20261111-improved,Q13,Q13-S3,improved,supported,supported,,,,21632,deepseek-flash,b17d519,2026-11-11T18:02:09+08:00,因此无法依据现有资料回答该问题。
+run-20261111-improved,Q14,Q14-S1,improved,supported,supported,,,,16536,deepseek-flash,b17d519,2026-11-11T18:02:26+08:00,"核验服务的请求模型设置了 extra=""forbid""，多余字段会导致 422。"
+run-20261111-improved,Q14,Q14-S2,improved,supported,supported,,,,16536,deepseek-flash,b17d519,2026-11-11T18:02:26+08:00,Dify 检索结果通常包含 content、score、document_id、metadata 等字段，不能原样传入。
+run-20261111-improved,Q14,Q14-S3,improved,supported,supported,,,,16536,deepseek-flash,b17d519,2026-11-11T18:02:26+08:00,资料未明确列出 evidence 映射后应保留哪些字段。
+run-20261111-improved,Q15,Q15-S1,improved,supported,supported,,,,14292,deepseek-flash,b17d519,2026-11-11T18:02:40+08:00,工作流把步骤预先定义好
+run-20261111-improved,Q15,Q15-S2,improved,supported,supported,,,,14292,deepseek-flash,b17d519,2026-11-11T18:02:40+08:00,真实系统常把 Agent 与工作流结合
+run-20261111-improved,Q15,Q15-S3,improved,supported,supported,,,,14292,deepseek-flash,b17d519,2026-11-11T18:02:40+08:00,外层用工作流保证关键步骤和权限
+run-20261111-improved,Q15,Q15-S4,improved,supported,supported,,,,14292,deepseek-flash,b17d519,2026-11-11T18:02:40+08:00,内层用 Agent 处理需要灵活决策的子任务
+run-20261111-improved,Q16,Q16-S0,improved,verification_failed,,,,incomplete_completion,26454,deepseek-flash,b17d519,2026-11-11T18:03:06+08:00,Verification could not be completed: incomplete_completion
+run-20261111-improved,Q17,Q17-S1,improved,supported,supported,,,,5137,deepseek-flash,b17d519,2026-11-11T18:03:12+08:00,检索到的资料仅在列举未覆盖内容时提到「扩散模型的前向/反向过程数学推导」。
+run-20261111-improved,Q17,Q17-S2,improved,supported,supported,,,,5137,deepseek-flash,b17d519,2026-11-11T18:03:12+08:00,资料并未给出前向加噪或反向去噪的具体推导。
+run-20261111-improved,Q17,Q17-S3,improved,supported,supported,,,,5137,deepseek-flash,b17d519,2026-11-11T18:03:12+08:00,其余段落讨论的是下一个 token 预测。
+run-20261111-improved,Q17,Q17-S4,improved,supported,supported,,,,5137,deepseek-flash,b17d519,2026-11-11T18:03:12+08:00,其余段落包含 Transformer 小结，与扩散模型推导问题无关。
+run-20261111-improved,Q18,Q18-S1,improved,partially_supported,partially_supported,,,,23622,deepseek-flash,b17d519,2026-11-11T18:03:35+08:00,资料中没有 PPO 或 GRPO 完整损失函数的推导内容。
+run-20261111-improved,Q18,Q18-S2,improved,partially_supported,supported,,,,23622,deepseek-flash,b17d519,2026-11-11T18:03:35+08:00,另一处仅泛泛说明对序列所有位置求和或平均得到训练损失，未涉及 PPO/GRPO。
+run-20261111-improved,Q19,Q19-S1,improved,supported,supported,,,,4684,deepseek-flash,b17d519,2026-11-11T18:03:40+08:00,资料中没有多模态模型视觉编码器的具体结构内容。
+run-20261111-improved,Q19,Q19-S2,improved,supported,supported,,,,4684,deepseek-flash,b17d519,2026-11-11T18:03:40+08:00,资料将多模态模型视觉编码器的具体结构列为未涉及/不展开的主题。
+run-20261111-improved,Q20,Q20-S1,improved,partially_supported,supported,,,,11530,deepseek-flash,b17d519,2026-11-11T18:03:51+08:00,资料提到预训练数据会经过清洗、去重、过滤和配比。
+run-20261111-improved,Q20,Q20-S2,improved,partially_supported,supported,,,,11530,deepseek-flash,b17d519,2026-11-11T18:03:51+08:00,资料指出“每个参数配多少 token”只是经验规则。
+run-20261111-improved,Q20,Q20-S3,improved,partially_supported,unsupported,,,,11530,deepseek-flash,b17d519,2026-11-11T18:03:51+08:00,资料未提供某个具体厂商模型的训练数据配比。
+run-20261111-improved,Q20,Q20-S4,improved,partially_supported,unsupported,,,,11530,deepseek-flash,b17d519,2026-11-11T18:03:51+08:00,资料未提及任何未公开 benchmark 的数值。
+run-20261111-improved,Q21,Q21-S0,improved,verification_failed,,,,incomplete_completion,25609,deepseek-flash,b17d519,2026-11-11T18:04:17+08:00,Verification could not be completed: incomplete_completion
+run-20261111-improved,Q22,Q22-S1,improved,partially_supported,partially_supported,,,,14848,deepseek-flash,b17d519,2026-11-11T18:04:32+08:00,资料中没有关于 Dify 某个具体版本默认分块大小和默认 top_k 的数值信息。
+run-20261111-improved,Q22,Q22-S2,improved,partially_supported,supported,,,,14848,deepseek-flash,b17d519,2026-11-11T18:04:32+08:00,分块大小没有统一最优值。
+run-20261111-improved,Q22,Q22-S3,improved,partially_supported,supported,,,,14848,deepseek-flash,b17d519,2026-11-11T18:04:32+08:00,top_k 表示取回候选片段的数量。
+run-20261111-improved,Q23,Q23-S0,improved,verification_failed,,,,incomplete_completion,26080,deepseek-flash,b17d519,2026-11-11T18:04:58+08:00,Verification could not be completed: incomplete_completion
+run-20261111-improved,Q24,Q24-S1,improved,partially_supported,partially_supported,,,,14959,deepseek-flash,b17d519,2026-11-11T18:05:13+08:00,资料中没有给出某个厂商 Agent 框架的完整 API 调用示例
+run-20261111-improved,Q24,Q24-S2,improved,partially_supported,partially_supported,,,,14959,deepseek-flash,b17d519,2026-11-11T18:05:13+08:00,检索到的内容把“某个厂商 Agent 框架的完整 API”列为未涵盖事项
+run-20261111-improved,Q25,Q25-S0,improved,verification_failed,,,,incomplete_completion,26423,deepseek-flash,b17d519,2026-11-11T18:05:39+08:00,Verification could not be completed: incomplete_completion
+run-20261111-improved,Q26,Q26-S1,improved,supported,supported,,,,7525,deepseek-flash,b17d519,2026-11-11T18:05:47+08:00,temperature 越高只是更随机，并不保证更有创造力
+run-20261111-improved,Q26,Q26-S2,improved,supported,supported,,,,7525,deepseek-flash,b17d519,2026-11-11T18:05:47+08:00,说法 A 是一种常见直觉，认为提高随机性会让模型更可能选择不常见词、产生多样表达
+run-20261111-improved,Q26,Q26-S3,improved,supported,supported,,,,7525,deepseek-flash,b17d519,2026-11-11T18:05:47+08:00,说法 B 强调高 temperature 会增加多样性，但也可能增加跑题、事实错误和格式不稳定
+run-20261111-improved,Q26,Q26-S4,improved,supported,supported,,,,7525,deepseek-flash,b17d519,2026-11-11T18:05:47+08:00,课程问答、证据核验等任务通常需要较低 temperature 以保证稳定和可校验
+run-20261111-improved,Q27,Q27-S1,improved,partially_supported,supported,,,,20551,deepseek-flash,b17d519,2026-11-11T18:06:07+08:00,资料中 Agent 的边界存在两种说法。
+run-20261111-improved,Q27,Q27-S2,improved,partially_supported,supported,,,,20551,deepseek-flash,b17d519,2026-11-11T18:06:07+08:00,宽松定义认为“能调用工具就算 Agent”。
+run-20261111-improved,Q27,Q27-S3,improved,partially_supported,supported,,,,20551,deepseek-flash,b17d519,2026-11-11T18:06:07+08:00,更完整的定义是能感知环境、制定计划、调用工具、根据反馈调整行为并多步执行目标的系统。
+run-20261111-improved,Q27,Q27-S4,improved,partially_supported,partially_supported,,,,20551,deepseek-flash,b17d519,2026-11-11T18:06:07+08:00,仅“能调用工具”不足以按完整定义认定为 Agent。
+run-20261111-improved,Q27,Q27-S5,improved,partially_supported,supported,,,,20551,deepseek-flash,b17d519,2026-11-11T18:06:07+08:00,调用工具可能产生真实副作用。
+run-20261111-improved,Q28,Q28-S1,improved,partially_supported,unsupported,,,,16306,deepseek-flash,b17d519,2026-11-11T18:06:24+08:00,资料没有给出“RLHF 和 DPO 哪个更好”的唯一结论。
+run-20261111-improved,Q28,Q28-S2,improved,partially_supported,supported,,,,16306,deepseek-flash,b17d519,2026-11-11T18:06:24+08:00,DPO 相比 RLHF 实现更简单。
+run-20261111-improved,Q28,Q28-S3,improved,partially_supported,supported,,,,16306,deepseek-flash,b17d519,2026-11-11T18:06:24+08:00,DPO 相比 RLHF 训练更稳定。
+run-20261111-improved,Q28,Q28-S4,improved,partially_supported,supported,,,,16306,deepseek-flash,b17d519,2026-11-11T18:06:24+08:00,DPO 在开源模型对齐中很常见。
+run-20261111-improved,Q28,Q28-S5,improved,partially_supported,supported,,,,16306,deepseek-flash,b17d519,2026-11-11T18:06:24+08:00,DPO 也不是万能的。
+run-20261111-improved,Q29,Q29-S1,improved,partially_supported,supported,,,,7644,deepseek-flash,b17d519,2026-11-11T18:06:31+08:00,资料中的“幻觉”不只指事实错误，还包括“无依据”“引用错误”“张冠李戴”“过度概括”等与给定证据不一致的情况。
+run-20261111-improved,Q29,Q29-S2,improved,partially_supported,supported,,,,7644,deepseek-flash,b17d519,2026-11-11T18:06:31+08:00,第一章把“幻觉”概括为“看似合理但事实错误或没有依据的内容”。
+run-20261111-improved,Q29,Q29-S3,improved,partially_supported,partially_supported,,,,7644,deepseek-flash,b17d519,2026-11-11T18:06:31+08:00,两处口径并非统一为单一标准，而是前者细分类型、后者作概括定义。
+run-20261111-improved,Q30,Q30-S1,improved,partially_supported,supported,,,,17894,deepseek-flash,b17d519,2026-11-11T18:06:49+08:00,这些指标比单一“准确率”更能反映 RAG 问答的真实质量。
+run-20261111-improved,Q30,Q30-S2,improved,partially_supported,supported,,,,17894,deepseek-flash,b17d519,2026-11-11T18:06:49+08:00,“有引用”不等于“引用支持结论”，需要逐条核验。
+run-20261111-improved,Q30,Q30-S3,improved,partially_supported,unsupported,,,,17894,deepseek-flash,b17d519,2026-11-11T18:06:49+08:00,资料中没有关于“拒答率”的内容，无法据此判断是否应纳入评估。

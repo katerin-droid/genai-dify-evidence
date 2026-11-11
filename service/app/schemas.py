@@ -66,3 +66,23 @@ class EvidenceVerifyResponse(StrictModel):
     evidence_count: int = Field(ge=0)
     message: str
     error_code: str | None = None
+
+
+Question = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=2000, strict=True)]
+
+
+class ChatRequest(StrictModel):
+    question: Question
+    conversation_id: Identifier | None = None
+
+
+class ChatResponse(StrictModel):
+    """Unified /api/chat payload; upstream failures stay HTTP 200 with verification_failed."""
+    mode: Literal["dify"] = "dify"
+    answer: str = ""
+    overall_status: Status
+    claims: list[ClaimResult] = Field(default_factory=list, max_length=5)
+    evidence_count: int = Field(default=0, ge=0)
+    message: str
+    error_code: str | None = None
+    conversation_id: str | None = None

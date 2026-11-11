@@ -1,1 +1,1 @@
-question_id,mode,status,support_label,score,run_id
+run_id,question_id,claim_id,mode,overall_status,claim_status,support_label,score,error_code,latency_ms,model,commit,checked_at,notes

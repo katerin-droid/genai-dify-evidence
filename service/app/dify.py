@@ -1,9 +1,12 @@
 """Blocking chat-messages call to the Dify application API. No retries, no secret logging."""
 import json
+import re
 
 import httpx
 
 from .config import ChatSettings
+
+_THINK_BLOCK = re.compile(r"(?is)<think.*?</think[^>]*>|</?think[^>]*>|<!--dify-deepseek-reasoning-->")
 
 
 class DifyFailure(Exception):
@@ -25,7 +28,8 @@ def split_answer(raw: str) -> tuple[str, dict | None]:
         except ValueError:
             parsed = None
         if isinstance(parsed, dict) and isinstance(parsed.get("overall_status"), str):
-            head = tail[:cut].strip() if cut >= 0 else ""
+            head = tail[:cut] if cut >= 0 else ""
+            head = _THINK_BLOCK.sub("", head).strip()
             return head, parsed
         if cut < 0:
             return tail, None

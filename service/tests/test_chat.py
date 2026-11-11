@@ -175,5 +175,13 @@ def test_split_answer_without_json_returns_none():
     assert body is None
 
 
+def test_split_answer_strips_deepseek_think_block():
+    raw = ("<think>\n<!--dify-deepseek-reasoning-->推理过程，含换行。\n</think>"
+           "答案正文（E1）。\n\n" + json.dumps(VERIFY_BODY, ensure_ascii=False))
+    answer, body = split_answer(raw)
+    assert answer == "答案正文（E1）。"
+    assert body["overall_status"] == "supported"
+
+
 def test_dify_failure_carries_only_safe_code():
     assert str(DifyFailure("upstream_timeout")) == "upstream_timeout"

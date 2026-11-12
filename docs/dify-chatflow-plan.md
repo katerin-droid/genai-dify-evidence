@@ -1,6 +1,6 @@
 # Dify Chatflow 工作流方案
 
-状态：**已落地**。云端 Dify 1.19.0 已按本文创建应用「课程问答证据核验」并发布版本 #3，导出文件为 `dify/workflow/chatflow-course-qa.yml`。第 15 节记录实际配置与实测输出，与本文前面的设计稿如有差异，以第 15 节为准。本文不包含任何密钥。
+状态：**已落地**。云端 Dify 1.19.0 已按本文创建应用「课程问答证据核验」，线上已发布版本 **#9**；`dify/workflow/chatflow-course-qa.yml` 是版本 #4 的导出（节点结构相同，检索参数与知识库绑定有差异，见第 15 节末尾）。第 15 节记录实际配置与实测输出，与本文前面的设计稿如有差异，以第 15 节为准。本文不包含任何密钥。
 
 ## 1. 目标与边界
 
@@ -8,7 +8,7 @@
 
 ```text
 用户输入
-  → 知识检索（genai-course-vector-v2，top_k=5）
+  → 知识检索（genai-course-vector-v2，top_k=8）
   → 代码执行（Evidence 裁剪）
   → LLM（deepseek-flash）
   → 代码执行（JSON 转义）
@@ -293,7 +293,7 @@ python -m service.scripts.validate_evidence_mapping
 1. Dify 1.19.0 的 Code 节点可用（`code_language: python3`），用它做 evidence 裁剪和请求体组装。
 2. Knowledge Retrieval 输出 chunk 含 `content`、`title`/`document_name`、`metadata.page`；`page` 不保证存在，代码节点做了兜底。
 3. HTTP 节点不能可靠地内联数组变量，且文本插值不做 JSON 转义；改为代码节点 `json.dumps` 生成整串 body，HTTP 节点 body 用 `raw-text` 只引用一个变量。
-4. 知识库使用 SiliconFlow `BAAI/bge-m3` 向量检索，`top_k=5`，权重检索（vector 权重 1），未开 rerank。
+4. 知识库使用 SiliconFlow `BAAI/bge-m3` 向量检索，`top_k=8`，权重检索（`keyword_weight=0`、`vector_weight=1`，实际等价纯向量），未开 rerank。
 5. Chatflow 没有 End 节点，用「直接回复」输出。
 6. 仍待确认：`/v1/chat-messages` 是否返回结构化 `claims`；平台工作流总超时上限；`/api/chat` 的最终 schema 与多轮策略。
 
@@ -303,7 +303,7 @@ python -m service.scripts.validate_evidence_mapping
 |---|---|
 | 应用名 | 课程问答证据核验 |
 | 应用类型 | Chatflow（`mode: advanced-chat`） |
-| 平台版本 | Dify 1.19.0，已发布版本 #3 |
+| 平台版本 | Dify 1.19.0，已发布版本 #9 |
 | 依赖插件 | `langgenius/deepseek:0.0.26`、`langgenius/siliconflow:0.0.64` |
 | 知识库 | `genai-course-vector-v2` |
 
@@ -318,7 +318,7 @@ python -m service.scripts.validate_evidence_mapping
 | 节点 | 关键输出 | 备注 |
 |---|---|---|
 | 用户输入 | `question` | 开始节点 |
-| 知识检索 | `result` | `top_k=5`，bge-m3 |
+| 知识检索 | `result` | `top_k=8`，bge-m3 |
 | 代码执行 | `evidence_json`、`evidence_count` | 裁剪为 `id/content/source/page`，最多 50 条 |
 | LLM | `text` | `deepseek-flash`，temperature 0.2，按（E1）编号引用 |
 | JSON转义 | `result` | 剥离 think 段，`json.dumps` 生成完整请求体 |
@@ -339,3 +339,24 @@ python -m service.scripts.validate_evidence_mapping
 实测（预览输入「什么是 KV Cache？」）：`overall_status=supported`、3 条 claims 全部 `supported`、`evidence_count=3`、`error_code=null`。
 
 已知限制：`answer` 是「文本 + JSON」混合体，`/api/chat` 需要在空行处切分或改用工作流运行详情接口读取 `outputs`；在实测 `/v1/chat-messages` 之前不要假设它返回结构化 `claims`。
+
+### 15.1 版本 #9 与导出文件的差异（2026-11-12）
+
+线上版本从 #3 演进到 #9，主要变化：
+
+| 变化 | 内容 |
+|---|---|
+| 检索参数 | `top_k` 5 → 8；`keyword_weight=0`、`vector_weight=1`（等价纯向量），未开 rerank |
+| 知识库材料 | Markdown 原文 → 纯文本预处理版（`tools/build_knowledge_base_materials.py`），解决「只召回标题、正文丢失」 |
+| 知识库绑定 | 重新绑定到 `4d403051-ccdc-434e-8285-af93ddcb5660`；此前一次误绑旧库导致 `evidence_count=0`、`error_code=no_evidence` |
+| 结果补全节点 | 在 HTTP 节点后补一次代码执行，把 `source`/`page` 回填进 `citations[]`（`page` 缺失时为空，不显示「后端未提供」） |
+
+仓库里的 `dify/workflow/chatflow-course-qa.yml` 仍是 **#4** 的导出：节点与连线相同，只差上表的检索参数和 `dataset_id`。导入后必须按 [`knowledge-base-rebuild.md`](knowledge-base-rebuild.md) 重新绑定知识库并确认 `top_k=8`。
+
+版本 #9 实测（云端 `POST /api/chat`，`evidence_count=8`）：
+
+| 问题 | 整体状态 | 引用原文长度（字） |
+|---|---|---|
+| 这门课有哪些学习要求？ | partially_supported | 53 / 28（完整列出 6 条学习要求） |
+| agent 是什么 | supported | 52 / 116 / 71 |
+| Transformer 的注意力怎么计算的？ | supported | 18 / 88 / 17 / 48（含 `Attention(Q, K, V) = softmax(QK^T / sqrt(d_k)) V`） |

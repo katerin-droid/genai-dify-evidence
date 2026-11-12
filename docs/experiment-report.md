@@ -2,6 +2,7 @@
 
 > 状态：改进版结果已由真实运行产生并落库；baseline 为**配对分析**（复用同次生成的答案，不额外调用模型），逐题数据见 `evaluation/baseline_answers.csv`、`evaluation/improved_responses.jsonl`。
 > 数据来源：`evaluation/results.csv`、`evaluation/runs.csv`（由 `evaluation/build_results.py` 从 `evaluation/private/` 的原始响应汇总，原始响应不入库，脱敏副本已交付）。
+> 配置说明：下表是 **2026-11-11 跑数时**的状态（版本 #3–#5、`top_k=5`、Markdown 原文入库）。2026-11-12 起线上为版本 #9（`top_k=8`、材料换成纯文本预处理版），只做了抽题验证，**本报告全部指标未重跑**，引用时请勿与 #9 配置混用。
 
 ## 1. 实验目的
 

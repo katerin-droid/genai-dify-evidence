@@ -48,6 +48,9 @@ volumes/
 # Unauthorized course source materials
 /materials/
 /course-materials/
+# Derived plain-text copies of the same materials (regenerate with tools/build_knowledge_base_materials.py)
+/materials_v2/
+/materials_v3/
 
 # Local real-model smoke-test measurements
 /docs/local-deepseek-smoke-*.json

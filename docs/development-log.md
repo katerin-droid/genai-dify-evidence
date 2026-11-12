@@ -108,3 +108,12 @@
 - ui-status 增加 chat_available/dify_connected；前端真实问答入口仅在代理配置后可用，渲染 AI 回答与 claims，未连接时保持「服务尚未连接」。
 - 离线测试 13 项（MockTransport，无真实 HTTP），全量回归 81 passed。
 - SSH 隧道中断且服务器拒绝公钥（Permission denied），应用 API Key 创建与真实联调待崔贵恬恢复服务器访问后进行；未推送 GitHub。
+
+## 2026-11-12 线上修复与知识库分段返工（feat/dify-chat-proxy）
+- 服务器恢复后创建应用 API Key，隧道 127.0.0.1:18081 → 8081 打通，云端应用完成真实联调并部署。
+- 修复 invalid_upstream_response：DeepSeek 偶发输出 `<|dify-deepseek-reasoning|>` 推理标记，dify.py 先剥控制符，再用 JSONDecoder 从后往前扫 `{` 定位核验 JSON（b92d27a）。
+- 修复 Citations 拒收：结果补全节点会往 citations[] 补 source/page，schemas.py 的 extra="forbid" 与 Identifier 非空校验会整条拒掉；改为接受可选 source、page（允许空串/None）（23f1f47）。
+- 修复前端来源显示：引用来源优先读 citation.source/page，再回退 evidence[]；无页码时不再显示「页码：后端未提供」（d56161a、29e365b）。
+- 定位「只召回标题」根因：Dify 通用分段会自行解析 Markdown，把「标题 + 列表正文」拆散（实测 193 段）。新增 tools/build_knowledge_base_materials.py，把讲义转纯文本、按标题分节合并、段内不留换行，重新入库后每章 18–34 段、合计 144 段，「学习目标」段恢复 139–190 字。
+- 修正误绑知识库：一次 UI 自动化绑定落在已删除的 dataset（evidence_count=0、no_evidence），重新绑定 4d403051-ccdc-434e-8285-af93ddcb5660 后发布版本 #9，云端 /api/chat 实测 evidence_count=8，引用恢复为完整段落。
+- 文档同步：知识库重建说明补齐实测分段与检索参数；Dify 方案补充版本 #9 与导出文件（#4）的差异表；实验报告标注 30 题数据基于旧配置未重跑。

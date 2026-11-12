@@ -2,9 +2,11 @@
 
 此目录只保存后续从云端 Dify 导出的脱敏 DSL，不保存官方源码，也不保存任何密钥。
 
-- [`chatflow-course-qa.yml`](chatflow-course-qa.yml)：从云端 Dify 1.19 导出的应用包（`.ifpkg` 内的 `app.yaml`，`kind: app`、`version: 0.7.0`），对应已发布版本 #3。
+- [`chatflow-course-qa.yml`](chatflow-course-qa.yml)：从云端 Dify 1.19 导出的应用包（`.ifpkg` 内的 `app.yaml`，`kind: app`、`version: 0.7.0`），对应已发布版本 **#4**（节点结构与线上 #9 相同）。
 
-链路：用户输入 → 知识检索 → 代码执行（Evidence 裁剪）→ LLM → JSON转义（代码执行）→ HTTP 请求 → 直接回复。
+链路：用户输入 → 知识检索 → 代码执行（Evidence 裁剪）→ LLM → JSON转义（代码执行）→ HTTP 请求 → 结果补全（代码执行）→ 直接回复。
+
+注意：导出文件里的知识检索节点仍是 `top_k=5` 和旧 `dataset_id`。线上自版本 #9 起为 `top_k=8`、绑定 `4d403051-ccdc-434e-8285-af93ddcb5660`，且知识库材料换成了纯文本版（见 `docs/knowledge-base-rebuild.md`）。导入后**必须重新绑定知识库并确认 `top_k=8`**，不要直接使用导出文件里的 dataset 引用。
 
 JSON转义节点用 `json.dumps` 生成整串请求体，HTTP 节点 body 为 `raw-text` 且只插值 `{{#JSON转义.result#}}`，避免 Dify 原样拼接导致 JSON 非法（422）。
 

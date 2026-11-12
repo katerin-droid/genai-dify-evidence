@@ -6,7 +6,7 @@ Dify 负责课程知识库检索、问答与工作流编排；FastAPI 接收问�
 
 - `/verify` 已接入真实 DeepSeek（`VERIFIER_MODE=deepseek`），云端已部署；
 - `POST /api/chat` 服务端代理已实现，调用 Dify `/v1/chat-messages`（blocking），拆分并归一化核验结果；
-- 知识库 `genai-course-vector-v2` 已有 6 份讲义、bge-m3 索引，Chatflow 已发布版本 #3；
+- 知识库 `genai-course-vector-v2` 已有 6 份讲义（纯文本预处理版）、bge-m3 索引，Chatflow 已发布版本 #9（top_k=8）；
 - 评测 CSV 已填满（30 题 / 74 条金标 / 103 条系统陈述），实验结果与逐题数据见 `evaluation/`；
 - 自研服务没有数据库或后台任务，真实密钥仅通过环境变量注入，不落库、不入 Git。
 

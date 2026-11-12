@@ -42,9 +42,18 @@ class EvidenceVerifyRequest(VerifyRequest):
 Status = Literal["supported", "partially_supported", "unsupported", "verification_failed"]
 
 
+SourceStr = Annotated[str, StringConstraints(max_length=2000, strict=True)]
+# page may come from Dify as "" (no page in markdown chunks) or a real 1-based int; allow both.
+PageNum = Annotated[int, Field(strict=True, ge=1)] | Identifier | Literal[""]
+
+
 class Citation(StrictModel):
     evidence_id: Identifier
     quote: Text
+    # Optional enrichment merged in downstream: may come from Dify workflow (结果补全)
+    # or from the verifier itself. Empty string / None are both valid.
+    source: SourceStr | None = None
+    page: PageNum | None = None
 
 
 class ClaimResult(StrictModel):

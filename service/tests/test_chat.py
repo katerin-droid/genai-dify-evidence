@@ -172,6 +172,40 @@ def test_split_answer_strips_reasoning_tokens():
     assert body["overall_status"] == "supported"
 
 
+def test_chat_accepts_dify_v4_enriched_citations_with_source_and_page():
+    """Dify v4 结果补全节点向 citations 追加 source / page，
+    /api/chat 必须原样透传，不能因 StrictModel(extra=forbid) 拒绝。"""
+    enriched_body = dict(VERIFY_BODY)
+    enriched_body["claims"] = [{
+        "claim": "Agent 可以调用工具。",
+        "status": "supported",
+        "evidence_ids": ["E1", "E2"],
+        "reason": "E1/E2 均提到工具调用。",
+        "citations": [
+            {"evidence_id": "E1", "quote": "能调用工具就算 Agent。",
+             "source": "06-第6章-Agent评估与安全.md", "page": ""},
+            {"evidence_id": "E2", "quote": "工具调用是常见能力。",
+             "source": "06-第6章-Agent评估与安全.md", "page": None},
+        ],
+    }]
+    capture: dict = {}
+    client = make_client(payload=dify_payload(body=enriched_body), capture=capture)
+    response = client.post("/api/chat", json={"question": "Agent 是什么？"})
+    assert response.status_code == 200
+    data = response.json()
+    assert data["overall_status"] == "supported"
+    assert data["error_code"] is None
+    claims = data["claims"]
+    assert len(claims) == 1
+    cites = claims[0]["citations"]
+    assert len(cites) == 2
+    assert cites[0]["source"] == "06-第6章-Agent评估与安全.md"
+    assert cites[1]["source"] == "06-第6章-Agent评估与安全.md"
+    # page 允许为空字符串或 None，都不应触发校验错误
+    assert cites[0].get("page") in ("", None)
+    assert cites[1].get("page") in ("", None)
+
+
 def test_split_answer_pure_json_reply():
     raw = json.dumps(VERIFY_BODY, ensure_ascii=False)
     answer, body = split_answer(raw)

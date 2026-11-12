@@ -162,6 +162,16 @@ def test_split_answer_handles_blank_lines_in_llm_text():
     assert body["overall_status"] == "supported"
 
 
+def test_split_answer_strips_reasoning_tokens():
+    raw = ("<|dify-deepseek-reasoning|>先想想用哪段证据。\n"
+           + "回答正文（E1）。<|end▁of▁thinking|>\n"
+           + json.dumps(VERIFY_BODY, ensure_ascii=False))
+    answer, body = split_answer(raw)
+    assert "<|" not in answer
+    assert "回答正文（E1）。" in answer
+    assert body["overall_status"] == "supported"
+
+
 def test_split_answer_pure_json_reply():
     raw = json.dumps(VERIFY_BODY, ensure_ascii=False)
     answer, body = split_answer(raw)

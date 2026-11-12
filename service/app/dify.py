@@ -7,6 +7,7 @@ import httpx
 from .config import ChatSettings
 
 _THINK_BLOCK = re.compile(r"(?is)<think.*?</think[^>]*>|</?think[^>]*>|<!--dify-deepseek-reasoning-->")
+_CONTROL_TOKEN = re.compile(r"<\|[^|>]*\|>")
 
 
 class DifyFailure(Exception):
@@ -14,26 +15,24 @@ class DifyFailure(Exception):
 
 
 def split_answer(raw: str) -> tuple[str, dict | None]:
-    """Split the Chatflow reply 'LLM text + blank line + verifier JSON' into parts.
+    """Split the Chatflow reply 'LLM text + verifier JSON' into parts.
 
-    The verifier body is compact JSON without raw newlines, so the JSON object always
-    starts after the last blank line that precedes valid JSON containing overall_status.
+    DeepSeek may emit reasoning control tokens and reasoning prose inside the same
+    answer string, so control tokens are stripped first and the verifier object is
+    located by scanning braces from the end with a real JSON decoder.
     """
-    tail = (raw or "").rstrip()
-    while True:
-        cut = tail.rfind("\n\n")
-        candidate = tail[cut + 2:].strip() if cut >= 0 else tail.strip()
+    text = _CONTROL_TOKEN.sub("", _THINK_BLOCK.sub("", raw or "")).strip()
+    decoder = json.JSONDecoder()
+    for start in range(len(text) - 1, -1, -1):
+        if text[start] != "{":
+            continue
         try:
-            parsed = json.loads(candidate)
+            parsed, _ = decoder.raw_decode(text[start:])
         except ValueError:
-            parsed = None
+            continue
         if isinstance(parsed, dict) and isinstance(parsed.get("overall_status"), str):
-            head = tail[:cut] if cut >= 0 else ""
-            head = _THINK_BLOCK.sub("", head).strip()
-            return head, parsed
-        if cut < 0:
-            return tail, None
-        tail = tail[:cut]
+            return text[:start].strip(), parsed
+    return text, None
 
 
 class DifyClient:

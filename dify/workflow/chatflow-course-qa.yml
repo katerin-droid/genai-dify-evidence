@@ -97,19 +97,6 @@ workflow:
     - data:
         isInIteration: false
         isInLoop: false
-        sourceType: http-request
-        targetType: answer
-      id: 1794383467582-source-answer-target
-      selected: false
-      source: '1794383467582'
-      sourceHandle: source
-      target: answer
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInIteration: false
-        isInLoop: false
         sourceType: llm
         targetType: code
       id: llm-source-1794385197750-target
@@ -133,6 +120,45 @@ workflow:
       targetHandle: target
       type: custom
       zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: http-request
+        targetType: code
+      id: 1794383467582-source-1794442809015-target
+      selected: false
+      source: '1794383467582'
+      sourceHandle: source
+      target: '1794442809015'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: http-request
+        targetType: code
+      id: 1794383467582-source-1794444698174-target
+      selected: false
+      source: '1794383467582'
+      sourceHandle: source
+      target: '1794444698174'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: code
+        targetType: answer
+      id: 1794444698174-source-answer-target
+      selected: false
+      source: '1794444698174'
+      sourceHandle: source
+      target: answer
+      targetHandle: target
+      type: custom
+      zIndex: 0
     nodes:
     - data:
         selected: false
@@ -151,10 +177,10 @@ workflow:
       id: '1794379920773'
       position:
         x: 0
-        y: 5.5
+        y: 88
       positionAbsolute:
         x: 0
-        y: 5.5
+        y: 88
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -201,10 +227,10 @@ workflow:
       id: llm
       position:
         x: 1024
-        y: 16
+        y: 98.5
       positionAbsolute:
         x: 1024
-        y: 16
+        y: 98.5
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -212,23 +238,20 @@ workflow:
       width: 241
       zIndex: 0
     - data:
-        answer: '{{#llm.text#}}
-
-
-          {{#1794383467582.body#}}'
-        selected: false
+        answer: '{{#llm.text#}}{{#1794444698174.result#}}'
+        selected: true
         title: 直接回复
         type: answer
         variables: []
       height: 119
       id: answer
       position:
-        x: 2047
+        x: 2367
         y: 0
       positionAbsolute:
-        x: 2047
+        x: 2367
         y: 0
-      selected: false
+      selected: true
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -265,10 +288,10 @@ workflow:
       id: '1794380263407'
       position:
         x: 342
-        y: 15
+        y: 97.5
       positionAbsolute:
         x: 342
-        y: 15
+        y: 97.5
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -306,10 +329,10 @@ workflow:
       id: '1794382596723'
       position:
         x: 683
-        y: 34
+        y: 116.5
       positionAbsolute:
         x: 683
-        y: 34
+        y: 116.5
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -348,11 +371,11 @@ workflow:
       id: '1794383467582'
       position:
         x: 1706
-        y: 14
+        y: 96.5
       positionAbsolute:
         x: 1706
-        y: 14
-      selected: true
+        y: 96.5
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -395,18 +418,102 @@ workflow:
       id: '1794385197750'
       position:
         x: 1365
-        y: 34
+        y: 116.5
       positionAbsolute:
         x: 1365
-        y: 34
+        y: 116.5
       selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
       width: 241
       zIndex: 0
+    - data:
+        code: "def main(body: str = \"\", evidence_json: str = \"\") -> dict:\n  \
+          \  import json\n    try:\n        data = json.loads(body or \"{}\")\n  \
+          \      ev = {e.get(\"id\"): e for e in json.loads(evidence_json or \"[]\"\
+          )}\n    except Exception:\n        return {\"result\": body or \"\"}\n \
+          \   for c in data.get(\"claims\", []):\n        for cite in c.get(\"citations\"\
+          , []):\n            src = ev.get(cite.get(\"evidence_id\"), {})\n      \
+          \      cite[\"source\"] = cite.get(\"source\") or src.get(\"source\") or\
+          \ \"\"\n            cite[\"page\"] = cite.get(\"page\") or src.get(\"page\"\
+          ) or \"\"\n    return {\"result\": json.dumps(data, ensure_ascii=False)}"
+        code_language: python3
+        outputs:
+          result:
+            children: null
+            type: string
+        selected: false
+        title: 结果补全
+        type: code
+        variables:
+        - value_selector:
+          - '1794383467582'
+          - body
+          value_type: string
+          variable: body
+        - value_selector:
+          - '1794382596723'
+          - evidence_json
+          value_type: string
+          variable: evidence_json
+      height: 51
+      id: '1794442809015'
+      position:
+        x: 2067
+        y: 199
+      positionAbsolute:
+        x: 2067
+        y: 199
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+    - data:
+        code: "def main(body: str = \"\", evidence_json: str = \"\") -> dict:\n  \
+          \  import json\n    try:\n        data = json.loads(body or \"{}\")\n  \
+          \      ev = {e.get(\"id\"): e for e in json.loads(evidence_json or \"[]\"\
+          )}\n    except Exception:\n        return {\"result\": body or \"\"}\n \
+          \   for c in data.get(\"claims\", []):\n        for cite in c.get(\"citations\"\
+          , []):\n            src = ev.get(cite.get(\"evidence_id\"), {})\n      \
+          \      cite[\"source\"] = cite.get(\"source\") or src.get(\"source\") or\
+          \ \"\"\n            cite[\"page\"] = cite.get(\"page\") or src.get(\"page\"\
+          ) or \"\"\n    return {\"result\": json.dumps(data, ensure_ascii=False)}"
+        code_language: python3
+        outputs:
+          result:
+            children: null
+            type: string
+        selected: false
+        title: 结果补全
+        type: code
+        variables:
+        - value_selector:
+          - '1794383467582'
+          - body
+          value_type: string
+          variable: body
+        - value_selector:
+          - '1794382596723'
+          - evidence_json
+          value_type: string
+          variable: evidence_json
+      height: 51
+      id: '1794444698174'
+      position:
+        x: 2067
+        y: 0
+      positionAbsolute:
+        x: 2067
+        y: 0
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
     viewport:
-      x: -348.53819444444457
-      y: 432.89699074074076
-      zoom: 0.40509259259259267
+      x: 578.125
+      y: 443.5
+      zoom: 0.25
   rag_pipeline_variables: []

@@ -1,8 +1,10 @@
 # 评测数据说明
 
-本目录用于课程资料问答的 30 题测试集、人工金标和对照实验记录。当前状态：**30 题、56 条证据、74 条陈述级金标已填写并标记为 `ready`**，来源是本仓库 `materials/` 下的自建课程讲义（不是学校官方课件）。金标先逐条对照证据原文校验，再由刘英超人工抽查 10 条（`annotator=刘英超（抽查 10/74）`）。
+本目录用于课程资料问答的 30 题测试集、人工金标和对照实验记录。当前状态：**30 题、56 条证据、74 条陈述级金标已填写并标记为 `ready`**，来源是本仓库 `materials/` 下的自建课程讲义（不是学校官方课件）。
 
-真实实验已于 2026-11-11 完成：改进版（Dify + `/verify`）30 题全部成功，汇总见 `results.csv` / `runs.csv`，分析见 `docs/experiment-report.md`。baseline 组仅缺人工标注。
+**标注过程如实说明**：74 条金标先由 AI 辅助起草并逐条对照证据原文校验，随后由刘英超抽查 10 条确认。**当时未逐条记录被抽查的 `claim_id`**，因此无法精确追溯哪 10 条经过人工二次核对，属标注流程缺陷；`annotator` 字段统一写为「刘英超（AI 辅助起草；抽查 10/74，未逐条复核）」，不把 74 条全部声明为人工独立完成。
+
+真实实验已于 2026-11-11 完成：改进版（Dify + `/verify`）最终合并样本 30 题均成功（24 题旧批次 + 6 题修复后云端补跑），汇总见 `results.csv` / `runs.csv`，逐题脱敏明细见 `improved_responses.jsonl`、`paired_analysis.csv`、`baseline_answers.csv`，分析见 `docs/experiment-report.md`。baseline 为**配对分析**（复用同次生成的答案，不额外调用模型），不做独立重跑。
 
 ## 1. 数据与隐私约束
 
@@ -23,6 +25,9 @@
 | `results.csv` | 陈述/运行 | 记录系统输出与人工金标对照；支持陈述级指标 |
 | `run_questions.py` | 脚本 | 逐题调用 `/api/chat`，原始响应写 `private/`，每题独立会话 |
 | `build_results.py` | 脚本 | 汇总原始响应生成 `results.csv` / `runs.csv`，并打印指标 |
+| `improved_responses.jsonl` | 题 | 改进版 30 题脱敏原始响应：完整 answer、逐条 claim 原文、status、evidence_ids、citations |
+| `baseline_answers.csv` | 题 | baseline 的 30 题原始答案 + 人工核对结论（是否编造、是否漏答、复核人、日期） |
+| `paired_analysis.csv` | 题 | baseline 与 improved 的逐题配对表，可直接复算状态分布与耗时 |
 
 ## 3. 题目分布
 
@@ -58,23 +63,36 @@
 | `claim_text` | 从参考答案中拆出的、可独立判断的事实性陈述 |
 | `gold_status` | `supported` / `partially_supported` / `unsupported` |
 | `evidence_ids` | 支持或反驳该陈述的 `evidence.csv` ID；无证据时留空 |
+| `label_basis` | 标注依据：`evidence_support`（陈述是否被原文支持）或 `coverage_claim`（该陈述本身是“资料未覆盖”类元陈述） |
 | `annotator` | 标注人缩写 |
 | `annotated_at` | ISO 日期，例如 `2026-11-10` |
 | `notes` | 判断理由、冲突点、歧义说明 |
 
 **关于四态对齐：** 核验服务有四个状态，但 `verification_failed` 表示系统异常，不是人工语义判断。人工金标只使用 `supported / partially_supported / unsupported`；`verification_failed` 只出现在 `results.csv` 的 `overall_status/claim_status` 中，并在统计时单独计为系统失败，不能算作“缺乏依据”。
 
+**关于两个维度不能混用（重要）：**
+
+- `questions.csv` 的 `category` 记录的是**问题在资料中是否可回答**（`answerable / multi_evidence / no_answer / ambiguous`）；
+- `gold_labels.csv` 的 `gold_status` 记录的是**该条陈述是否被原文证据支持**。
+
+这两者不是一回事。8 条 `unsupported` 金标全部是 `Q17-C1`–`Q24-C1`，内容形如“本资料没有给出……的数学推导”——它们描述的是**资料的覆盖范围**，无法由“支持该主题的原文”来支持，因此标为 `unsupported`，并用 `label_basis=coverage_claim` 显式区分。它们**不代表答案编造**：这 8 道 `no_answer` 题的回答都正确声明了资料未覆盖。
+
+因此统计时按口径 A 处理：`no_answer` 类不进入陈述级一致率分母，只统计“是否明确声明未覆盖”；`evidence_support` 类（66 条 supported）才参与陈述级一致率。这样既不篡改标签，也不把两种概念混在一个比例里。
+
+当前 74 条中 66 条 `evidence_support / supported`、8 条 `coverage_claim / unsupported`，**没有任何 `partially_supported` 金标**——因此系统输出的 `partially_supported` 在陈述级只能被判为“与金标不一致”，这是金标覆盖不足，需后续补充部分支持类金标。
+
 建议至少 10 题由两人独立标注，记录分歧后再合并；分歧题不要强行统一，保留 `notes`。
 
 ## 5. 指标口径
 
-以陈述级为主，全部基于 `results.csv` 与 `gold_labels.csv` 的连接结果：
+以陈述级为主，全部基于 `results.csv` 与 `gold_labels.csv` 的连接结果。**所有比例必须写明分母**：
 
-- **核验标签准确率** = 系统 `claim_status` 与人工 `gold_status` 一致的陈述数 / 已标注陈述总数。
-- **无依据陈述识别召回率** = 正确判为 `unsupported` 的人工 `unsupported` 陈述数 / 人工 `unsupported` 陈述总数。
-- **无答案问题识别召回率** = 正确判为 `unsupported`（或 `unsupported/no_evidence`）的 `no_answer` 题数 / `no_answer` 题总数。
-- **有依据陈述误报率** = 被系统判为 `unsupported` 的人工 `supported` 陈述数 / 人工 `supported` 陈述总数。
-- **平均响应时间** = 从提交问题到核验结果返回的耗时均值；建议同时记录 P50/P95。
+- **对齐**：同题内按字符二元组相似度取最佳金标，`sim >= 0.35` 记为对齐。本次 103 条系统陈述中 58 条对齐（56.3%）、45 条未对齐（43.7%）；未对齐的不进入任何一致率的分母。
+- **陈述级一致率（语义类，口径 A）** = 系统 `claim_status` 与人工 `gold_status` 一致的已对齐陈述数 / 语义类（`answerable` + `multi_evidence` + `ambiguous`）已对齐陈述数 = 42/44 = **95.45%**。分母 44 条金标全为 `supported`，因此该指标只反映“不误杀”，不反映负例区分能力。
+- **有依据陈述误报率** = 系统判为 `unsupported` 的已对齐 `supported` 金标数 / 已对齐 `supported` 金标数 = 1/43 = **2.33%**（唯一一例 Q25-S2）。
+- **无依据陈述识别召回率** = 正确判为 `unsupported` 的 `coverage_claim` 金标数 / `coverage_claim` 金标数。本实验**不做该统计**：口径 A 下 `coverage_claim` 不参与陈述级指标；且人工核对后答案中无凭空编造陈述，正样本为 0。
+- **无答案问题识别准确率** = 明确声明“资料未覆盖”的 `no_answer` 题数 / `no_answer` 题数 = 8/8 = **100%**。
+- **平均响应时间** = 每题首条陈述的 `latency_ms` 均值（同题多条陈述不重复计权）= 12.8736 s；中位数 13.611 s；P95 按最近秩法取第 29 个值 = 23.622 s。
 - `verification_failed` 不计入上述语义指标的分母，单独报告系统失败率与错误码分布。
 
 `score` 字段当前没有定义；DeepSeek 核验响应不返回分值，留空即可，不要用 mock 的 `score=null` 当真实分数。

@@ -1,25 +1,26 @@
 # Dify Chatflow 工作流方案
 
-状态：方案稿，未在云端 Dify 创建或导出 DSL。本文中的节点变量名是建议命名，实际以 Dify 1.19.0 控制台的变量选择器为准。本文不包含任何密钥。
+状态：**已落地**。云端 Dify 1.19.0 已按本文创建应用「课程问答证据核验」并发布版本 #3，导出文件为 `dify/workflow/chatflow-course-qa.yml`。第 15 节记录实际配置与实测输出，与本文前面的设计稿如有差异，以第 15 节为准。本文不包含任何密钥。
 
 ## 1. 目标与边界
 
-目标链路：
+目标链路（已实现）：
 
 ```text
-Start
-  → Knowledge Retrieval（课程知识库）
-  → LLM Answer（DeepSeek）
-  → HTTP Request（POST http://verifier:8000/verify）
-  → Result Adapter（校验/透传）
-  → End
+用户输入
+  → 知识检索（genai-course-vector-v2，top_k=5）
+  → 代码执行（Evidence 裁剪）
+  → LLM（deepseek-flash）
+  → 代码执行（JSON 转义）
+  → HTTP 请求（POST http://verifier:8000/verify）
+  → 直接回复
 ```
 
 边界：
 
-- Dify 负责检索、生成答案、调用核验服务、把结果传给 `/api/chat`。
+- Dify 负责检索、生成答案、调用核验服务，并把结果交给 `POST /api/chat` 的调用方。
 - FastAPI `/verify` 负责逐条陈述核验；Dify 不重新计算 `overall_status`，只透传。
-- `/api/chat` 代理尚未实现；本文定义它需要消费的 Dify 输出。
+- `/api/chat` 代理**已实现**（`service/app/dify.py` + `main.py`），负责拆分「LLM 文本」与「核验 JSON」，并把 `overall_status / claims / citations / error_code` 归一化后返回前端。
 - 不在 Dify 里保存 DeepSeek Key、Dify 应用 Key 或任何密钥。
 
 ## 2. 前置条件

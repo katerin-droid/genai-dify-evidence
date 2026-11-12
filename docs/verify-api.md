@@ -83,3 +83,68 @@ mode 为 deepseek；evidence_count 是传入证据数量，不是引用数量。
 这是总体字段改名，需要原来读取 response.status 的客户端改为 response.overall_status；不能改动 claims[*].status 或 /health.status。
 真实模式从环境变量读取 DEEPSEEK_API_KEY、DEEPSEEK_BASE_URL、DEEPSEEK_MODEL、DEEPSEEK_TIMEOUT_SECONDS；模型名无默认值。应用不自行读取 .env，uvicorn --env-file 或手动脚本显式加载，已存在环境变量优先。
 离线测试使用合成环境值与 MockTransport 验证读取、Bearer header、模型名、URL；随后另经授权使用 deepseek-flash 完成一次真实三陈述冒烟测试，详情见 development-log.md。本文JSON仍为结构示例，不替代真实测试记录。真实凭据只存放在本地 Git 忽略的 .env，模板凭据字段为空。
+
+**模型名不写死**：核验模型由 `DEEPSEEK_MODEL` 决定。11-11 实验批次记录为 `deepseek-chat`（见 `evaluation/runs.csv`），早期冒烟测试曾用 `deepseek-flash`；两者不能混作同一项，报告与运行记录中必须分别写明。生成模型（Dify LLM 节点）为 `deepseek-flash`，与核验模型是两次独立调用。
+
+---
+
+## POST /api/chat（面向浏览器，服务端代理）
+
+由 FastAPI 代理调用 Dify `POST /v1/chat-messages`（`response_mode=blocking`），不让浏览器直接持有 Dify Key。
+
+### 请求
+
+```json
+{
+  "question": "什么是 KV Cache？",
+  "conversation_id": "可选，首轮留空"
+}
+```
+
+约束：`question` 为非空字符串（长度上限同 `/verify`）；`conversation_id` 为 `null` 或 Dify 返回的会话 ID。多余字段会被拒绝（`extra="forbid"`）。
+
+### 响应（HTTP 始终 200，除配置缺失）
+
+```json
+{
+  "mode": "dify",
+  "answer": "LLM 回答原文（已剥离 <think> 推理块）",
+  "overall_status": "supported",
+  "claims": [
+    {"claim": "……", "status": "supported", "evidence_ids": ["E1"], "citations": []}
+  ],
+  "evidence_count": 3,
+  "message": "Evaluated against supplied evidence only.",
+  "error_code": null,
+  "conversation_id": "dify 返回的会话 ID"
+}
+```
+
+| 字段 | 说明 |
+|---|---|
+| `mode` | 固定 `dify`，前端据此确认是真实问答而非示例 |
+| `answer` | Dify LLM 原文，已去掉 `<think>…</think>` 推理块 |
+| `overall_status` | 四态之一；上游异常时为 `verification_failed` |
+| `claims` | 最多 5 条，逐条状态与证据 ID |
+| `evidence_count` | 本次检索被裁剪进核验请求的证据条数 |
+| `error_code` | 系统异常码；非空时不代表“缺乏依据” |
+| `conversation_id` | 需在后续轮次回传以延续会话 |
+
+### 失败契约
+
+| 情形 | 行为 |
+|---|---|
+| 未配置 `DIFY_API_KEY` / `DIFY_API_BASE_URL` | **HTTP 503**，`error_code=dify_not_configured`，前端显示“服务尚未连接” |
+| Dify 超时、连接失败、5xx | HTTP 200 + `overall_status=verification_failed` + `error_code=upstream_*`（`upstream_timeout` / `upstream_error` / `upstream_invalid_response`） |
+| Dify 返回文本无法拆出核验 JSON | HTTP 200 + `verification_failed` + `error_code=invalid_upstream_response`，`answer` 仍返回原文 |
+| 正常 | HTTP 200，`error_code=null` |
+
+前端不得把 `verification_failed` 展示成“缺乏依据”；浏览器 JavaScript 中不得出现 Dify 或 DeepSeek Key。
+
+### GET /api/ui-status
+
+```json
+{"dify_connected": true, "chat_available": true, "verification_mode": "deepseek"}
+```
+
+用于前端判断按钮显示「开始真实核验 →」还是「服务尚未连接」。

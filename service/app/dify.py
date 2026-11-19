@@ -60,7 +60,26 @@ class DifyClient:
             answer = data["answer"]
             if not isinstance(answer, str):
                 raise DifyFailure("invalid_upstream_response")
-            return {"answer": answer, "conversation_id": data.get("conversation_id")}
+            evidence = []
+            retriever = (data.get("metadata") or {}).get("retriever_resources") or []
+            for i, r in enumerate(retriever):
+                if not isinstance(r, dict):
+                    continue
+                seg_id = r.get("segment_id") or f"seg_{i}"
+                content = r.get("content", "") or ""
+                source_name = r.get("document_name") or ""
+                position = r.get("position")
+                evidence.append({
+                    "id": seg_id,
+                    "content": content,
+                    "source": source_name or None,
+                    "page": position if isinstance(position, int) and position >= 1 else None,
+                })
+            return {
+                "answer": answer,
+                "conversation_id": data.get("conversation_id"),
+                "evidence": evidence,
+            }
         except httpx.TimeoutException:
             raise DifyFailure("upstream_timeout") from None
         except httpx.HTTPError:

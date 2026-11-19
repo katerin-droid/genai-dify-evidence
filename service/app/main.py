@@ -72,13 +72,16 @@ def create_app(settings: Settings | None = None, completion_client: DeepSeekClie
                                 error_code="invalid_upstream_response",
                                 message="无法解析问答链路返回的核验结果。",
                                 answer=answer,
-                                conversation_id=result.get("conversation_id"))
+                                conversation_id=result.get("conversation_id"),
+                                evidence=result.get("evidence") or [])
         status, claims, evidence_count, message, error_code = parsed
+        dify_evidence = result.get("evidence") or []
         return ChatResponse(overall_status=status, claims=claims,
                             evidence_count=evidence_count,
                             message=message or "Evaluated against supplied evidence only.",
                             error_code=error_code, answer=answer,
-                            conversation_id=result.get("conversation_id"))
+                            conversation_id=result.get("conversation_id"),
+                            evidence=dify_evidence)
 
     @app.get("/api/ui-status")
     def ui_status():

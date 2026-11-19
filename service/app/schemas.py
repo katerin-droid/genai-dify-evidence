@@ -95,3 +95,4 @@ class ChatResponse(StrictModel):
     message: str
     error_code: str | None = None
     conversation_id: str | None = None
+    evidence: list[Evidence] = Field(default_factory=list, max_length=50)
